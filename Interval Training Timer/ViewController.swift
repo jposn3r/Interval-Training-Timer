@@ -13,13 +13,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var restLabel: UILabel!
     @IBOutlet weak var activeTimerValue: UILabel!
     @IBOutlet weak var restTimerValue: UILabel!
+    
     @IBOutlet weak var cyclesRemainingLabel: UILabel!
     @IBOutlet weak var workoutControlButton: UIButton!
     
     @IBOutlet weak var restTimerPlusMinus: UIStepper!
     @IBOutlet weak var activeTimerPlusMinus: UIStepper!
-    var activeTimerInitialValue = 5
-    var restTimerInitialValue = 2
+    
+    var activeTimerInitialValue = 30
+    var restTimerInitialValue = 10
     var seconds = 30
     var cyclesRemaining = 10
     var timerState = "active"
@@ -27,11 +29,16 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        cyclesRemainingLabel.text = "cycles remaining: " + String(cyclesRemaining)
+        
+        activeTimerPlusMinus.value = Double(activeTimerInitialValue)
+        restTimerPlusMinus.value = Double(restTimerInitialValue)
+        cyclesRemainingLabel.text = String(cyclesRemaining)
     }
+    
     @IBAction func activeStepperChanged(_ sender: UIStepper) {
         let newActiveTimerValueAsInt = Int(sender.value)
         let newActiveTimerValueAsString = String(newActiveTimerValueAsInt)
+        print("initialValue: " + String(activeTimerInitialValue))
         print("value changed: " + newActiveTimerValueAsString)
         activeTimerValue.text = newActiveTimerValueAsString
         activeTimerInitialValue = newActiveTimerValueAsInt
@@ -141,7 +148,7 @@ class ViewController: UIViewController {
     func decrementCyclesRemaining() {
         cyclesRemaining -= 1
         if cyclesRemaining > 0 {
-            cyclesRemainingLabel.text = "cycles remaining: " + String(cyclesRemaining)
+            cyclesRemainingLabel.text = String(cyclesRemaining)
         } else {
             stopWorkout()
         }
@@ -150,7 +157,7 @@ class ViewController: UIViewController {
     
     func resetCyclesRemaining() {
         cyclesRemaining = 10
-        cyclesRemainingLabel.text = "cycles remaining: " + String(cyclesRemaining)
+        cyclesRemainingLabel.text = String(cyclesRemaining)
     }
 
 
