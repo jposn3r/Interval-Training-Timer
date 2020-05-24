@@ -30,9 +30,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setBackgroundGradient()
+        
         activeTimerPlusMinus.value = Double(activeTimerInitialValue)
         restTimerPlusMinus.value = Double(restTimerInitialValue)
         cyclesRemainingLabel.text = String(cyclesRemaining)
+    }
+    
+    func setBackgroundGradient() {
+//        let gradientLayer = CAGradientLayer()
+//        gradientLayer.frame = self.view.bounds
+//        gradientLayer.colors = [UIColor.black.cgColor, UIColor.darkGray.cgColor]
+//        self.view.layer.insertSublayer(gradientLayer, at: 0)
     }
     
     @IBAction func activeStepperChanged(_ sender: UIStepper) {
@@ -52,7 +61,7 @@ class ViewController: UIViewController {
         restTimerInitialValue = newRestTimerValueAsDouble
     }
     @IBAction func buttonWasPressed(_ sender: Any) {
-        if workoutControlButton.titleLabel?.text == "start workout" {
+        if workoutControlButton.titleLabel?.text == "START" {
             startWorkout()
         } else {
             stopWorkout()
@@ -66,10 +75,10 @@ class ViewController: UIViewController {
         activeTimerPlusMinus.isHidden = true
         restTimerPlusMinus.isHidden = true
         
-        restLabel.font = restLabel.font.withSize(30)
-        restTimerValue.font = restTimerValue.font.withSize(60)
-        activeTimerValue.text = String(activeTimerInitialValue)
-        restTimerValue.text = String(restTimerInitialValue)
+
+        activeTimerValue.text =
+            String(format: "%04.2f", activeTimerInitialValue)
+        restTimerValue.text = String(format: "%04.2f", restTimerInitialValue)
         
         seconds = activeTimerInitialValue
         
@@ -80,19 +89,16 @@ class ViewController: UIViewController {
             userInfo: nil,
             repeats: true)
         
-        workoutControlButton.setTitle("stop workout", for: .normal)
-        workoutControlButton.setTitleColor(UIColor.red, for: .normal)
+        workoutControlButton.setTitle("STOP", for: .normal)
+        workoutControlButton.backgroundColor = UIColor.red
+        
     }
     
     func stopWorkout() {
-        workoutControlButton.setTitle("start workout", for: .normal)
-        workoutControlButton.setTitleColor(UIColor.green, for: .normal)
+        workoutControlButton.setTitle("START", for: .normal)
+        workoutControlButton.backgroundColor = UIColor.green
         resetTimers()
         timer?.invalidate()
-        restLabel.font = restLabel.font.withSize(42)
-        restTimerValue.font = restTimerValue.font.withSize(80)
-        activeLabel.font = activeLabel.font.withSize(42)
-        activeTimerValue.font = activeTimerValue.font.withSize(80)
         resetCyclesRemaining()
         timerState = "active"
         activeTimerPlusMinus.isHidden = false
@@ -128,19 +134,11 @@ class ViewController: UIViewController {
             seconds = restTimerInitialValue
             activeLabel.textColor = UIColor.white
             restLabel.textColor = UIColor.green
-            activeLabel.font = activeLabel.font.withSize(30)
-            activeTimerValue.font = activeTimerValue.font.withSize(60)
-            restLabel.font = restLabel.font.withSize(42)
-            restTimerValue.font = restTimerValue.font.withSize(80)
         } else {
             timerState = "active"
             seconds = activeTimerInitialValue
             restLabel.textColor = UIColor.white
             activeLabel.textColor = UIColor.green
-            restLabel.font = restLabel.font.withSize(30)
-            restTimerValue.font = restTimerValue.font.withSize(60)
-            activeLabel.font = activeLabel.font.withSize(42)
-            activeTimerValue.font = activeTimerValue.font.withSize(80)
             decrementCyclesRemaining()
         }
     }
