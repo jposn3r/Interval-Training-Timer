@@ -20,9 +20,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var restTimerPlusMinus: UIStepper!
     @IBOutlet weak var activeTimerPlusMinus: UIStepper!
     
-    var activeTimerInitialValue = 30
-    var restTimerInitialValue = 10
-    var seconds = 30
+    var activeTimerInitialValue = 30.00
+    var restTimerInitialValue = 10.00
+    var seconds = 30.00
     var cyclesRemaining = 10
     var timerState = "active"
     var timer : Timer?
@@ -36,20 +36,20 @@ class ViewController: UIViewController {
     }
     
     @IBAction func activeStepperChanged(_ sender: UIStepper) {
-        let newActiveTimerValueAsInt = Int(sender.value)
-        let newActiveTimerValueAsString = String(newActiveTimerValueAsInt)
+        let newActiveTimerValueAsDouble = Double(sender.value)
+        let newActiveTimerValueAsString = String(format: "%04.2f", newActiveTimerValueAsDouble)
         print("initialValue: " + String(activeTimerInitialValue))
         print("value changed: " + newActiveTimerValueAsString)
         activeTimerValue.text = newActiveTimerValueAsString
-        activeTimerInitialValue = newActiveTimerValueAsInt
+        activeTimerInitialValue = newActiveTimerValueAsDouble
     }
     
     @IBAction func restStepperChanged(_ sender: UIStepper) {
-        let newRestTimerValueAsInt = Int(sender.value)
-        let newRestTimerValueAsString = String(newRestTimerValueAsInt)
+        let newRestTimerValueAsDouble = Double(sender.value)
+        let newRestTimerValueAsString = String(format: "%04.2f", newRestTimerValueAsDouble)
         print("value changed: " + newRestTimerValueAsString)
         restTimerValue.text = newRestTimerValueAsString
-        restTimerInitialValue = newRestTimerValueAsInt
+        restTimerInitialValue = newRestTimerValueAsDouble
     }
     @IBAction func buttonWasPressed(_ sender: Any) {
         if workoutControlButton.titleLabel?.text == "start workout" {
@@ -74,7 +74,7 @@ class ViewController: UIViewController {
         seconds = activeTimerInitialValue
         
         timer = Timer.scheduledTimer(
-            timeInterval: 1.0,
+            timeInterval: 0.01,
             target: self, selector:
             #selector(ViewController.activeCounter),
             userInfo: nil,
@@ -90,9 +90,9 @@ class ViewController: UIViewController {
         resetTimers()
         timer?.invalidate()
         restLabel.font = restLabel.font.withSize(42)
-        restTimerValue.font = restTimerValue.font.withSize(100)
+        restTimerValue.font = restTimerValue.font.withSize(80)
         activeLabel.font = activeLabel.font.withSize(42)
-        activeTimerValue.font = activeTimerValue.font.withSize(100)
+        activeTimerValue.font = activeTimerValue.font.withSize(80)
         resetCyclesRemaining()
         timerState = "active"
         activeTimerPlusMinus.isHidden = false
@@ -101,22 +101,22 @@ class ViewController: UIViewController {
     
     @objc func activeCounter()
     {
-        seconds -= 1
-        if seconds == 0 {
+        seconds -= 0.01
+        if seconds <= 0 {
             resetTimers()
             swapTimers()
         } else {
             if timerState == "active" {
-                activeTimerValue.text = String(seconds)
+                activeTimerValue.text = String(format: "%04.2f", seconds)
             } else {
-                restTimerValue.text = String(seconds)
+                restTimerValue.text = String(format: "%04.2f", seconds)
             }
         }
     }
     
     func resetTimers() {
-        activeTimerValue.text = String(activeTimerInitialValue)
-        restTimerValue.text = String(restTimerInitialValue)
+        activeTimerValue.text = String(format: "%04.2f", activeTimerInitialValue)
+        restTimerValue.text = String(format: "%04.2f", restTimerInitialValue)
         activeLabel.textColor = UIColor.white
         restLabel.textColor = UIColor.white
         seconds = activeTimerInitialValue
@@ -131,7 +131,7 @@ class ViewController: UIViewController {
             activeLabel.font = activeLabel.font.withSize(30)
             activeTimerValue.font = activeTimerValue.font.withSize(60)
             restLabel.font = restLabel.font.withSize(42)
-            restTimerValue.font = restTimerValue.font.withSize(100)
+            restTimerValue.font = restTimerValue.font.withSize(80)
         } else {
             timerState = "active"
             seconds = activeTimerInitialValue
@@ -140,7 +140,7 @@ class ViewController: UIViewController {
             restLabel.font = restLabel.font.withSize(30)
             restTimerValue.font = restTimerValue.font.withSize(60)
             activeLabel.font = activeLabel.font.withSize(42)
-            activeTimerValue.font = activeTimerValue.font.withSize(100)
+            activeTimerValue.font = activeTimerValue.font.withSize(80)
             decrementCyclesRemaining()
         }
     }
