@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var restTimerPlusMinus: UIStepper!
     @IBOutlet weak var activeTimerPlusMinus: UIStepper!
+    @IBOutlet weak var cyclesPlusMinus: UIStepper!
     
     var activeTimerInitialValue = 30.00
     var restTimerInitialValue = 10.00
@@ -34,6 +35,7 @@ class ViewController: UIViewController {
         
         activeTimerPlusMinus.value = Double(activeTimerInitialValue)
         restTimerPlusMinus.value = Double(restTimerInitialValue)
+        cyclesPlusMinus.value = Double(cyclesRemaining)
         cyclesRemainingLabel.text = String(cyclesRemaining)
     }
     
@@ -47,19 +49,30 @@ class ViewController: UIViewController {
     @IBAction func activeStepperChanged(_ sender: UIStepper) {
         let newActiveTimerValueAsDouble = Double(sender.value)
         let newActiveTimerValueAsString = String(format: "%04.2f", newActiveTimerValueAsDouble)
+        
         print("initialValue: " + String(activeTimerInitialValue))
         print("value changed: " + newActiveTimerValueAsString)
+        
         activeTimerValue.text = newActiveTimerValueAsString
         activeTimerInitialValue = newActiveTimerValueAsDouble
     }
     
-    @IBAction func restStepperChanged(_ sender: UIStepper) {
+    @IBAction func restStepperChanged(_ sender: UIStepper)
+    {
         let newRestTimerValueAsDouble = Double(sender.value)
         let newRestTimerValueAsString = String(format: "%04.2f", newRestTimerValueAsDouble)
         print("value changed: " + newRestTimerValueAsString)
         restTimerValue.text = newRestTimerValueAsString
         restTimerInitialValue = newRestTimerValueAsDouble
     }
+    
+    @IBAction func cyclesStepperChanged(_ sender: UIStepper) {
+        let newCyclesRemaining = Int(sender.value)
+        cyclesRemainingLabel.text = String(newCyclesRemaining)
+        cyclesRemaining = newCyclesRemaining
+    }
+    
+    
     @IBAction func buttonWasPressed(_ sender: Any) {
         if workoutControlButton.titleLabel?.text == "START" {
             startWorkout()
@@ -74,8 +87,8 @@ class ViewController: UIViewController {
         
         activeTimerPlusMinus.isHidden = true
         restTimerPlusMinus.isHidden = true
+        cyclesPlusMinus.isHidden = true
         
-
         activeTimerValue.text =
             String(format: "%04.2f", activeTimerInitialValue)
         restTimerValue.text = String(format: "%04.2f", restTimerInitialValue)
@@ -103,6 +116,7 @@ class ViewController: UIViewController {
         timerState = "active"
         activeTimerPlusMinus.isHidden = false
         restTimerPlusMinus.isHidden = false
+        cyclesPlusMinus.isHidden = false
     }
     
     @objc func activeCounter()
@@ -150,7 +164,6 @@ class ViewController: UIViewController {
         } else {
             stopWorkout()
         }
-        
     }
     
     func resetCyclesRemaining() {
