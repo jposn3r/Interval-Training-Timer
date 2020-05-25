@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var cyclesRemainingLabel: UILabel!
     @IBOutlet weak var workoutControlButton: UIButton!
     @IBOutlet weak var resetButton: UIButton!
+    @IBOutlet weak var pauseButton: UIButton!
     
     @IBOutlet weak var restTimerPlusMinus: UIStepper!
     @IBOutlet weak var activeTimerPlusMinus: UIStepper!
@@ -30,31 +31,130 @@ class ViewController: UIViewController {
     var timerState = "active"
     var totalTime = 0.00
     var timer : Timer?
+    var userSelectedCycles : Double?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setBackgroundGradient()
-        
+        pauseButton.isHidden = true
+        resetButton.isHidden = true
         activeTimerPlusMinus.value = Double(activeTimerInitialValue)
         restTimerPlusMinus.value = Double(restTimerInitialValue)
         cyclesPlusMinus.value = Double(cyclesRemaining)
         cyclesRemainingLabel.text = String(cyclesRemaining)
     }
     
-    func setBackgroundGradient() {
-//        let gradientLayer = CAGradientLayer()
-//        gradientLayer.frame = self.view.bounds
-//        gradientLayer.colors = [UIColor.black.cgColor, UIColor.darkGray.cgColor]
-//        self.view.layer.insertSublayer(gradientLayer, at: 0)
+    //    ====================================================
+    //    workout controls
+    //    ====================================================
+    
+    func startWorkout() {
+        activeLabel.textColor = UIColor.green
+        restLabel.textColor = UIColor.white
+        
+        activeTimerPlusMinus.isHidden = true
+        restTimerPlusMinus.isHidden = true
+        cyclesPlusMinus.isHidden = true
+        resetButton.isHidden = true
+        pauseButton.isHidden = false
+        
+        activeTimerValue.text =
+            String(format: "%04.2f", activeTimerInitialValue)
+        restTimerValue.text = String(format: "%04.2f", restTimerInitialValue)
+        userSelectedCycles = cyclesPlusMinus.value
+        
+        seconds = activeTimerInitialValue
+        
+        timer = Timer.scheduledTimer(
+            timeInterval: 0.01,
+            target: self, selector:
+            #selector(ViewController.activeCounter),
+            userInfo: nil,
+            repeats: true)
+        
+        workoutControlButton.setTitle("STOP", for: .normal)
+        workoutControlButton.backgroundColor = UIColor.red
     }
+    
+    @IBAction func pauseWorkout(_ sender: Any) {
+        if pauseButton.titleLabel?.text == "PAUSE" {
+            timer?.invalidate()
+            pauseButton.setTitle("RESUME", for: .normal)
+            pauseButton.backgroundColor = UIColor.green
+        } else {
+            resumeWorkout()
+        }
+    }
+    
+    func resumeWorkout() {
+        timer = Timer.scheduledTimer(
+            timeInterval: 0.01,
+            target: self, selector:
+            #selector(ViewController.activeCounter),
+            userInfo: nil,
+            repeats: true)
+        pauseButton.backgroundColor = UIColor.orange
+        pauseButton.setTitle("PAUSE", for: .normal)
+    }
+    
+    func stopWorkout() {
+        workoutControlButton.setTitle("START", for: .normal)
+        workoutControlButton.backgroundColor = UIColor.green
+        resetTimers()
+        timer?.invalidate()
+        resetCyclesRemaining()
+        timerState = "active"
+        activeTimerPlusMinus.isHidden = false
+        restTimerPlusMinus.isHidden = false
+        cyclesPlusMinus.isHidden = false
+        resetButton.isHidden = false
+        pauseButton.isHidden = true
+    }
+    
+    @IBAction func resetButtonPressed(_ sender: Any) {
+        totalTime = 0
+        totalTimeLabel.text = "00:00.00"
+        resetCyclesRemaining()
+        resetButton.isHidden = true
+    }
+    
+    
+    @IBAction func buttonWasPressed(_ sender: Any) {
+        if workoutControlButton.titleLabel?.text == "START" {
+            startWorkout()
+        } else {
+            stopWorkout()
+        }
+    }
+    
+    @objc func activeCounter()
+    {
+        seconds -= 0.01
+        totalTimeLabel.text = String(format: "%04.2f", totalTime)
+        if seconds <= 0 {
+            resetTimers()
+            swapTimers()
+        } else {
+            totalTime += 0.01
+            if timerState == "active" {
+                activeTimerValue.text = String(format: "%04.2f", seconds)
+            } else {
+                restTimerValue.text = String(format: "%04.2f", seconds)
+            }
+        }
+    }
+    
+//    ====================================================
+//    Steppers
+//    ====================================================
+    
     
     @IBAction func activeStepperChanged(_ sender: UIStepper) {
         let newActiveTimerValueAsDouble = Double(sender.value)
         let newActiveTimerValueAsString = String(format: "%04.2f", newActiveTimerValueAsDouble)
         
-        print("initialValue: " + String(activeTimerInitialValue))
-        print("value changed: " + newActiveTimerValueAsString)
+//        print("initialValue: " + String(activeTimerInitialValue))
+//        print("value changed: " + newActiveTimerValueAsString)
         
         activeTimerValue.text = newActiveTimerValueAsString
         activeTimerInitialValue = newActiveTimerValueAsDouble
@@ -74,77 +174,10 @@ class ViewController: UIViewController {
         cyclesRemainingLabel.text = String(newCyclesRemaining)
         cyclesRemaining = newCyclesRemaining
     }
-    @IBAction func resetButtonPressed(_ sender: Any) {
-        totalTime = 0
-        totalTimeLabel.text = "00:00.00"
-        resetCyclesRemaining()
-    }
     
-    
-    @IBAction func buttonWasPressed(_ sender: Any) {
-        if workoutControlButton.titleLabel?.text == "START" {
-            startWorkout()
-        } else {
-            stopWorkout()
-        }
-    }
-    
-    func startWorkout() {
-        activeLabel.textColor = UIColor.green
-        restLabel.textColor = UIColor.white
-        
-        activeTimerPlusMinus.isHidden = true
-        restTimerPlusMinus.isHidden = true
-        cyclesPlusMinus.isHidden = true
-        resetButton.isHidden = true
-        
-        activeTimerValue.text =
-            String(format: "%04.2f", activeTimerInitialValue)
-        restTimerValue.text = String(format: "%04.2f", restTimerInitialValue)
-        
-        seconds = activeTimerInitialValue
-        
-        timer = Timer.scheduledTimer(
-            timeInterval: 0.01,
-            target: self, selector:
-            #selector(ViewController.activeCounter),
-            userInfo: nil,
-            repeats: true)
-        
-        workoutControlButton.setTitle("STOP", for: .normal)
-        workoutControlButton.backgroundColor = UIColor.red
-        
-    }
-    
-    func stopWorkout() {
-        workoutControlButton.setTitle("START", for: .normal)
-        workoutControlButton.backgroundColor = UIColor.green
-        resetTimers()
-        timer?.invalidate()
-        resetCyclesRemaining()
-        timerState = "active"
-        activeTimerPlusMinus.isHidden = false
-        restTimerPlusMinus.isHidden = false
-        cyclesPlusMinus.isHidden = false
-        resetButton.isHidden = false
-    }
-    
-    @objc func activeCounter()
-    {
-        seconds -= 0.01
-        totalTimeLabel.text = String(format: "%04.2f", totalTime)
-        if seconds <= 0 {
-            resetTimers()
-            swapTimers()
-        } else {
-            totalTime += 0.01
-            if timerState == "active" {
-                activeTimerValue.text = String(format: "%04.2f", seconds)
-            } else {
-                restTimerValue.text = String(format: "%04.2f", seconds)
-            }
-        }
-    }
+    //    ====================================================
+    //    timers
+    //    ====================================================
     
     func resetTimers() {
         activeTimerValue.text = String(format: "%04.2f", activeTimerInitialValue)
@@ -169,6 +202,10 @@ class ViewController: UIViewController {
         }
     }
     
+    //    ====================================================
+    //    cycles remaining
+    //    ====================================================
+    
     func decrementCyclesRemaining() {
         cyclesRemaining -= 1
         if cyclesRemaining > 0 {
@@ -179,7 +216,7 @@ class ViewController: UIViewController {
     }
     
     func resetCyclesRemaining() {
-        cyclesRemaining = 10
+        cyclesRemaining = Int(userSelectedCycles!)
         cyclesPlusMinus.value = Double(cyclesRemaining)
         cyclesRemainingLabel.text = String(cyclesRemaining)
     }
