@@ -13,9 +13,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var restLabel: UILabel!
     @IBOutlet weak var activeTimerValue: UILabel!
     @IBOutlet weak var restTimerValue: UILabel!
+    @IBOutlet weak var totalTimeLabel: UILabel!
     
     @IBOutlet weak var cyclesRemainingLabel: UILabel!
     @IBOutlet weak var workoutControlButton: UIButton!
+    @IBOutlet weak var resetButton: UIButton!
     
     @IBOutlet weak var restTimerPlusMinus: UIStepper!
     @IBOutlet weak var activeTimerPlusMinus: UIStepper!
@@ -26,6 +28,7 @@ class ViewController: UIViewController {
     var seconds = 30.00
     var cyclesRemaining = 10
     var timerState = "active"
+    var totalTime = 0.00
     var timer : Timer?
     
     override func viewDidLoad() {
@@ -71,6 +74,11 @@ class ViewController: UIViewController {
         cyclesRemainingLabel.text = String(newCyclesRemaining)
         cyclesRemaining = newCyclesRemaining
     }
+    @IBAction func resetButtonPressed(_ sender: Any) {
+        totalTime = 0
+        totalTimeLabel.text = "00:00.00"
+        resetCyclesRemaining()
+    }
     
     
     @IBAction func buttonWasPressed(_ sender: Any) {
@@ -88,6 +96,7 @@ class ViewController: UIViewController {
         activeTimerPlusMinus.isHidden = true
         restTimerPlusMinus.isHidden = true
         cyclesPlusMinus.isHidden = true
+        resetButton.isHidden = true
         
         activeTimerValue.text =
             String(format: "%04.2f", activeTimerInitialValue)
@@ -117,15 +126,18 @@ class ViewController: UIViewController {
         activeTimerPlusMinus.isHidden = false
         restTimerPlusMinus.isHidden = false
         cyclesPlusMinus.isHidden = false
+        resetButton.isHidden = false
     }
     
     @objc func activeCounter()
     {
         seconds -= 0.01
+        totalTimeLabel.text = String(format: "%04.2f", totalTime)
         if seconds <= 0 {
             resetTimers()
             swapTimers()
         } else {
+            totalTime += 0.01
             if timerState == "active" {
                 activeTimerValue.text = String(format: "%04.2f", seconds)
             } else {
@@ -168,6 +180,7 @@ class ViewController: UIViewController {
     
     func resetCyclesRemaining() {
         cyclesRemaining = 10
+        cyclesPlusMinus.value = Double(cyclesRemaining)
         cyclesRemainingLabel.text = String(cyclesRemaining)
     }
 
