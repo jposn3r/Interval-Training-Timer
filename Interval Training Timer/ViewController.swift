@@ -93,7 +93,7 @@ class ViewController: UIViewController {
             #selector(ViewController.activeCounter),
             userInfo: nil,
             repeats: true)
-        pauseButton.backgroundColor = UIColor.orange
+        pauseButton.backgroundColor = UIColor.systemOrange
         pauseButton.setTitle("PAUSE", for: .normal)
     }
     
@@ -109,12 +109,13 @@ class ViewController: UIViewController {
         cyclesPlusMinus.isHidden = false
         resetButton.isHidden = false
         pauseButton.isHidden = true
+        pauseButton.setTitle("PAUSE", for: .normal)
+        pauseButton.backgroundColor = UIColor.systemOrange
     }
     
     @IBAction func resetButtonPressed(_ sender: Any) {
         totalTime = 0
         totalTimeLabel.text = "00:00.00"
-        resetCyclesRemaining()
         resetButton.isHidden = true
     }
     
@@ -130,7 +131,7 @@ class ViewController: UIViewController {
     @objc func activeCounter()
     {
         seconds -= 0.01
-        totalTimeLabel.text = String(format: "%04.2f", totalTime)
+        totalTimeLabel.text = calculateTimeValues(seconds: totalTime)
         if seconds <= 0 {
             resetTimers()
             swapTimers()
@@ -152,9 +153,6 @@ class ViewController: UIViewController {
     @IBAction func activeStepperChanged(_ sender: UIStepper) {
         let newActiveTimerValueAsDouble = Double(sender.value)
         let newActiveTimerValueAsString = String(format: "%04.2f", newActiveTimerValueAsDouble)
-        
-//        print("initialValue: " + String(activeTimerInitialValue))
-//        print("value changed: " + newActiveTimerValueAsString)
         
         activeTimerValue.text = newActiveTimerValueAsString
         activeTimerInitialValue = newActiveTimerValueAsDouble
@@ -220,7 +218,21 @@ class ViewController: UIViewController {
         cyclesPlusMinus.value = Double(cyclesRemaining)
         cyclesRemainingLabel.text = String(cyclesRemaining)
     }
+    
+    //    ====================================================
+    //    helpers
+    //    ====================================================
 
+    func calculateTimeValues(seconds : Double) -> (String) {
+        let finalMinutes = Int(seconds) / 60 % 60
+        let finalSeconds = Int(seconds) % 60
+        let finalMilli = seconds.truncatingRemainder(dividingBy: 1.0)
+    
+        print(seconds)
+        let finalTimeString = String(format: "%02d", finalMinutes) + ":" + String(format: "%02d", finalSeconds) + "." + String(format: "%.2f", finalMilli).dropFirst(2)
+        print(finalTimeString)
+        return finalTimeString
+    }
 
 }
 
